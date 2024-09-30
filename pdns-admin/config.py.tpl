@@ -28,5 +28,9 @@ SAML_ENABLED = False
 {{ end -}}
 {{ end }}
 ### DATABASE CONFIG
+{{ if eq .PDNS_ADMIN_SQLA_DB_TYPE "sqlite" -}}
+SQLALCHEMY_DATABASE_URI = SQLA_DB_TYPE + ':///' + SQLA_DB_FILE
+{{ else -}}
 SQLALCHEMY_DATABASE_URI = SQLA_DB_TYPE + '://' + SQLA_DB_USER + ':' + SQLA_DB_PASSWORD + '@' + SQLA_DB_HOST + ':' + str(SQLA_DB_PORT) + '/' + SQLA_DB_NAME
+{{ end -}}
 SQLALCHEMY_TRACK_MODIFICATIONS = True

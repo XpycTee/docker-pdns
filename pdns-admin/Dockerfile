@@ -24,6 +24,7 @@ RUN arch=$([ "$(arch)" = 'aarch64' ] && echo -n 'arm64' || echo -n 'amd64') \
     python3-pyyaml \
     python3-saml \
     python3-xmlsec \
+    sqlite \
     supervisor \
     uwsgi \
     uwsgi-plugin-python3 \
@@ -31,7 +32,7 @@ RUN arch=$([ "$(arch)" = 'aarch64' ] && echo -n 'arm64' || echo -n 'amd64') \
     https://github.com/kha7iq/subvars/releases/download/v0.1.5/subvars_${arch}.rpm \
   && dnf clean all
 
-RUN mkdir -p /opt/powerdns-admin \
+RUN mkdir -p /opt/powerdns-admin/database \
   && curl -fsSL https://github.com/PowerDNS-Admin/PowerDNS-Admin/archive/refs/tags/v0.4.1.tar.gz \
     | tar -xzf - -C /opt/powerdns-admin --strip 1 \
   && sed -i \
