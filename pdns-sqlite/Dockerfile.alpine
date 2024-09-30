@@ -1,6 +1,6 @@
 FROM alpine:3.20.0
 
-RUN arch=$([ "$(arch)" = 'aarch64' ] && echo -n 'arm64' || echo -n 'amd64') \
+RUN arch=$( ([ "$(arch)" = 'aarch64' ] && echo -n 'arm64') || ([ "$(arch)" = 'armv7l' ] && echo -n 'armv6') || echo -n 'amd64' ) \
   && apk update \
   && apk upgrade \
   && apk add \
