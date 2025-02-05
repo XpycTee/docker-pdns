@@ -57,7 +57,7 @@
         volumes:
           - /etc/localtime:/etc/localtime:ro
         ulimits:
-          - 'nofile:5000:5000'
+          - 'nofile:10000:10000'
       tags:
         - pdns-recursor
 
@@ -217,7 +217,7 @@
           PDNS_ADMIN_SQLA_DB_PORT: '5432'
           PDNS_ADMIN_SQLA_DB_USER: 'postgres'
           PDNS_ADMIN_SQLA_DB_PASSWORD: 'my-secret-pw'
-          PDNS_VERSION: '4.8'
+          PDNS_VERSION: '4.9'
           PDNS_API_KEY: 'secret'
       tags:
         - pdns-admin

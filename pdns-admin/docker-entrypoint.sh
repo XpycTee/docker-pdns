@@ -2,6 +2,12 @@
 
 set -euo pipefail
 
+: "${DEBUG:=0}"
+
+if [ "${DEBUG}" -eq 1 ]; then
+    set -x
+fi
+
 # Configure db env vars
 : "${PDNS_ADMIN_SQLA_DB_TYPE:=mysql}" # or postgres or sqlite
 : "${PDNS_ADMIN_SQLA_DB_HOST:=${MYSQL_ENV_MYSQL_HOST:-mysql}}"
@@ -48,7 +54,7 @@ subvars --prefix 'PDNS_ADMIN_' < '/config.py.tpl' > '/opt/powerdns-admin/powerdn
 
 # Initialize DB if needed
 if [[ "${PDNS_ADMIN_SQLA_DB_TYPE}" == 'mysql' ]]; then
-    SQL_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST} -P ${PDNS_ADMIN_SQLA_DB_PORT} -u ${PDNS_ADMIN_SQLA_DB_USER} -p${PDNS_ADMIN_SQLA_DB_PASSWORD} -e"
+    SQL_COMMAND="mariadb -h ${PDNS_ADMIN_SQLA_DB_HOST} -P ${PDNS_ADMIN_SQLA_DB_PORT} -u ${PDNS_ADMIN_SQLA_DB_USER} -p${PDNS_ADMIN_SQLA_DB_PASSWORD} -e"
 elif [[ "${PDNS_ADMIN_SQLA_DB_TYPE}" == 'postgres' ]]; then
     PGPASSWORD="${PDNS_ADMIN_SQLA_DB_PASSWORD}"
     export PGPASSWORD

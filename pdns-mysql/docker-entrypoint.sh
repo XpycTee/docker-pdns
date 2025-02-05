@@ -2,6 +2,12 @@
 
 set -eu
 
+: "${DEBUG:=0}"
+
+if [ "${DEBUG}" -eq 1 ]; then
+    set -x
+fi
+
 ##### Function definitions ####
 
 deriveMySQLSettingsFromExistingConfigFile() {
@@ -38,20 +44,20 @@ deriveMySQLSettingsFromEnvironment() {
 }
 
 generateMySQLCommand() {
-  EXTRA=''
+  : "${MYSQL_CLIENT_EXTRA_PARAMS:=}"
 
   # Password Auth
-  if [ "${PDNS_gmysql_password}" ]; then
-      EXTRA="${EXTRA} -p${PDNS_gmysql_password}"
+  if [ "${PDNS_gmysql_password:-}" ]; then
+      MYSQL_CLIENT_EXTRA_PARAMS="${MYSQL_CLIENT_EXTRA_PARAMS} -p${PDNS_gmysql_password}"
   fi
 
   # Allow socket connections
   if [ "${PDNS_gmysql_socket:-}" ]; then
       export PDNS_gmysql_host='localhost'
-      EXTRA="${EXTRA} --socket=${PDNS_gmysql_socket}"
+      MYSQL_CLIENT_EXTRA_PARAMS="${MYSQL_CLIENT_EXTRA_PARAMS} --socket=${PDNS_gmysql_socket}"
   fi
 
-  MYSQL_COMMAND="mysql -h ${PDNS_gmysql_host} -P ${PDNS_gmysql_port} -u ${PDNS_gmysql_user}${EXTRA}"
+  MYSQL_COMMAND="mariadb -h ${PDNS_gmysql_host} -P ${PDNS_gmysql_port} -u ${PDNS_gmysql_user} ${MYSQL_CLIENT_EXTRA_PARAMS}"
 }
 
 createDatabaseIfRequested() {
