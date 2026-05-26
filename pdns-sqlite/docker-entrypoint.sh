@@ -100,6 +100,7 @@ createDatabaseIfRequested
 initDatabase
 initSuperslave
 
+chown -R pdns: "/var/lib/powerdns";
 chown -R pdns: "$PDNS_gsqlite3_database";
 
 if [ "${USE_EXISTING_CONFIG_FILE:-false}" = 'false' ]; then

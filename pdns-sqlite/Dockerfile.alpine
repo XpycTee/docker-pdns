@@ -1,6 +1,6 @@
 FROM alpine:3.23
 
-RUN arch=$( ([ "$(arch)" = 'aarch64' ] && echo -n 'arm64') || ([ "$(arch)" = 'armv7l' ] && echo -n 'armv6') || echo -n 'amd64' ) \
+ RUN arch=$( ([ "$(arch)" = 'aarch64' ] && echo -n 'arm64') || ([ "$(arch)" = 'armv7l' ] && echo -n 'arm') || echo -n 'x86_64' ) \
   && apk update \
   && apk upgrade \
   && apk add \
@@ -8,9 +8,11 @@ RUN arch=$( ([ "$(arch)" = 'aarch64' ] && echo -n 'arm64') || ([ "$(arch)" = 'ar
     pdns-backend-sqlite3 \
     pdns-doc \
     sqlite \
-  && wget -O subvars.apk https://github.com/TektonOps/subvars/releases/download/v0.1.5/subvars_${arch}.apk \
-  && apk add --allow-untrusted subvars.apk \
-  && rm -rf subvars.apk /var/cache/apk/*
+  && wget -O subvars.tar.gz \
+      https://github.com/TektonOps/subvars/releases/download/v0.1.5/subvars_Linux_${arch}.tar.gz \
+  && tar -xzf subvars.tar.gz \
+  && mv subvars /usr/local/bin/subvars \
+  && chmod +x /usr/local/bin/subvars
 
 RUN mkdir -p /run/pdns \
   && mkdir -p /var/lib/powerdns \
