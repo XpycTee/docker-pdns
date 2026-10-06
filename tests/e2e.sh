@@ -3,7 +3,7 @@
 set -u
 
 usage() {
-    echo "Usage: $0 [all|recursor-fedora|recursor-alpine|mysql-fedora|mysql-alpine|pgsql-fedora|pgsql-alpine|admin]" >&2
+    echo "Usage: $0 [all|recursor-fedora|recursor-alpine|mysql-fedora|mysql-alpine|pgsql-fedora|pgsql-alpine|sqlite-alpine|admin]" >&2
 }
 
 if [ "$#" -gt 1 ]; then
@@ -14,9 +14,9 @@ fi
 requested_target=${1:-all}
 case "$requested_target" in
     all)
-        targets="recursor-fedora recursor-alpine mysql-fedora mysql-alpine pgsql-fedora pgsql-alpine admin"
+        targets="recursor-fedora recursor-alpine mysql-fedora mysql-alpine pgsql-fedora pgsql-alpine sqlite-alpine admin"
         ;;
-    recursor-fedora|recursor-alpine|mysql-fedora|mysql-alpine|pgsql-fedora|pgsql-alpine|admin)
+    recursor-fedora|recursor-alpine|mysql-fedora|mysql-alpine|pgsql-fedora|pgsql-alpine|sqlite-alpine|admin)
         targets=$requested_target
         ;;
     *)
@@ -25,7 +25,7 @@ case "$requested_target" in
         ;;
 esac
 
-for source_dir in pdns-recursor pdns-mysql pdns-pgsql pdns-admin; do
+for source_dir in pdns-recursor pdns-mysql pdns-pgsql pdns-sqlite pdns-admin; do
     if [ ! -d "$source_dir" ]; then
         echo "Missing source directory: $source_dir (run this script from the repository root)" >&2
         exit 1
@@ -39,6 +39,8 @@ for dockerfile in \
     pdns-mysql/Dockerfile.alpine \
     pdns-pgsql/Dockerfile \
     pdns-pgsql/Dockerfile.alpine \
+    pdns-sqlite/Dockerfile \
+    pdns-sqlite/Dockerfile.alpine \
     pdns-admin/Dockerfile
 do
     if [ ! -f "$dockerfile" ]; then
@@ -497,6 +499,10 @@ run_target() {
             dockerfile=pdns-pgsql/Dockerfile.alpine
             context=pdns-pgsql
             ;;
+        sqlite-alpine)
+            dockerfile=pdns-sqlite/Dockerfile.alpine
+            context=pdns-sqlite
+            ;;
         admin)
             dockerfile=pdns-admin/Dockerfile
             context=pdns-admin
@@ -558,6 +564,20 @@ run_target() {
                 fail "$target" "could not start target container"
             fi
             ;;
+        sqlite-alpine)
+            if ! docker run -d \
+                --name "$container" \
+                --network "$network" \
+                -e PDNS_version_string=docker-pdns-e2e \
+                -e PDNS_api=yes \
+                -e PDNS_api_key=powerdns \
+                -e PDNS_webserver=yes \
+                -e PDNS_webserver_address=0.0.0.0 \
+                -e PDNS_webserver_allow_from=0.0.0.0/0 \
+                "$image" >/dev/null; then
+                fail "$target" "could not start target container"
+            fi
+            ;;
     esac
 
     wait_for_health "$target" "$container"
@@ -567,7 +587,7 @@ run_target() {
             assert_dns "$target" "$container"
             assert_recursion "$target" "$container"
             ;;
-        mysql-fedora|mysql-alpine|pgsql-fedora|pgsql-alpine)
+        mysql-fedora|mysql-alpine|pgsql-fedora|pgsql-alpine|sqlite-alpine)
             assert_dns "$target" "$container"
             assert_authoritative_zone "$target" "$container"
             ;;

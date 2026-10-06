@@ -18,6 +18,7 @@ jobs:
           - mysql-alpine
           - pgsql-fedora
           - pgsql-alpine
+          - sqlite-alpine
           - admin
     steps:
       - name: Check Out Repo
