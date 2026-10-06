@@ -183,6 +183,8 @@ PDNS_ADMIN_SQLA_DB_NAME=powerdnsadmin
 ```
 If linked with official [mariadb](https://hub.docker.com/_/mariadb/) image with alias `mysql`, the connection can be automatically configured, so you don't need to specify any of the above.
 
+Additional options for the MariaDB command-line client used during database initialization can be supplied with `MYSQL_CLIENT_EXTRA_PARAMS`. For example, set `MYSQL_CLIENT_EXTRA_PARAMS='--skip-ssl'` when connecting to an older MariaDB server that does not support the client's required TLS mode.
+
 Env vars for pgsql configuration:
 ```
 PDNS_ADMIN_SQLA_DB_TYPE=postgres
@@ -208,13 +210,12 @@ webserver-address=0.0.0.0
 webserver-allow-from=172.5.0.0/16
 ```
 
-And again, PowerDNS connection is configured via env vars (it needs url of the PowerDNS server, api key and a version of PowerDNS server, for example 4.0):
+And again, the PowerDNS connection is configured via environment variables for the server URL and API key:
 ```
 (name=default value)
 
 PDNS_API_URL="http://pdns:8081/"
 PDNS_API_KEY=""
-PDNS_VERSION=""
 ```
 
 If this container is linked with pdns-mysql from this repo with alias `pdns`, it will be configured automatically and none of the env vars from above are needed to be specified.
